@@ -8,6 +8,7 @@ namespace ToDoList.Models
         {
             this.Items = new HashSet<CategoryItem>();
         }
+        public virtual ApplicationUser User { get; set; }
 
         public int CategoryId { get; set; }
         public string Name { get; set; }

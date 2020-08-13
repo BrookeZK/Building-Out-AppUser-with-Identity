@@ -27,17 +27,18 @@ namespace ToDoList.Controllers
     }
 
     //updated Index method
-    public async Task<ActionResult> Index()
+    public ActionResult Index()
     {
-      var userId = this.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-      var currentUser = await _userManager.FindByIdAsync(userId);
-      var userItems = _db.Items.Where(entry => entry.User.Id == currentUser.Id).ToList();
+      // var userId = this.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+      // var currentUser = await _userManager.FindByIdAsync(userId);
+      var userItems = _db.Items.ToList();
       return View(userItems);
     }
 
     public ActionResult Create()
     {
-      ViewBag.CategoryId = new SelectList(_db.Categories, "CategoryId", "Name");
+      var userId = this.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+      ViewBag.CategoryId = new SelectList(_db.Categories.Where(category => category.User.Id == userId), "CategoryId", "Name");
       return View();
     }
 

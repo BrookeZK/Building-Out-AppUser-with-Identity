@@ -9,6 +9,8 @@ namespace ToDoList.Models
     public DbSet<Item> Items { get; set; }
     public DbSet<CategoryItem> CategoryItem { get; set; }
 
+    public DbSet<ApplicationUserCategory> ApplicationUserCategory { get; set; }
+
     public ToDoListContext(DbContextOptions options) : base(options) { }
   }
 }

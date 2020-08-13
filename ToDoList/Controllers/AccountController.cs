@@ -1,8 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Identity;
 using ToDoList.Models;
-using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Linq;
 using ToDoList.ViewModels;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc.Rendering;
+
+//new using directives
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using System.Threading.Tasks;
+using System.Security.Claims;
 
 namespace ToDoList.Controllers
 {
@@ -19,9 +27,32 @@ namespace ToDoList.Controllers
       _db = db;
     }
 
-    public ActionResult Index()
+    public async Task<ActionResult> Index()
     {
-      return View();
+      var userId = this.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+      var currentUser = await _userManager.FindByIdAsync(userId);
+
+      return View(currentUser);
+    }
+
+     public async Task<ActionResult> Categories()
+    {
+      var userId = this.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+      var currentUser = await _userManager.FindByIdAsync(userId);
+
+      ViewBag.MyCategories = _db.ApplicationUserCategory.Include(join => join.Category).Where(join => join.ApplicationUser == currentUser).ToList();
+
+      return View(currentUser);
+    }
+
+    public async Task<ActionResult> Items()
+    {
+      var userId = this.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+      var currentUser = await _userManager.FindByIdAsync(userId);
+
+      ViewBag.MyItems = _db.Items.Where(item => item.User.Id == currentUser.Id).ToList();
+
+      return View(currentUser);
     }
 
     public IActionResult Register()
@@ -32,7 +63,7 @@ namespace ToDoList.Controllers
     [HttpPost]
     public async Task<ActionResult> Register(RegisterViewModel model)
     {
-      var user = new ApplicationUser { UserName = model.Email };
+      var user = new ApplicationUser { UserName = model.Email, FirstName = model.FirstName, LastName = model.LastName };
       IdentityResult result = await _userManager.CreateAsync(user, model.Password);
       if (result.Succeeded)
       {

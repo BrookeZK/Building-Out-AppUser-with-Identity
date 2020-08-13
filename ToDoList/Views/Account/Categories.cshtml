@@ -1,0 +1,31 @@
+@model ToDoList.Models.ApplicationUser
+
+@{
+  ViewData["Title"] = "My Categories";
+}
+
+<div class="text-center">
+  <h1>@ViewData["Title"]</h1>
+</div>
+
+@if (User.Identity.IsAuthenticated)
+{
+    <p>@Html.ActionLink("New Category", "Create", "Categories")</p>
+}
+
+@if (Model.Categories.Count == 0)
+{
+  <p>You have not added any categories yet.</p>
+}
+else
+{
+
+  <ul>
+
+    @foreach (var join in ViewBag.MyCategories)
+    {
+        <li>@Html.ActionLink($"{join.Category.Name}", "Details", "Categories", new { id = join.CategoryId })</li>
+    }
+    
+  </ul>
+}

@@ -4,14 +4,23 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using System.Threading.Tasks;
+using System.Security.Claims;
+
 namespace ToDoList.Controllers
 {
+  [Authorize] //new line
   public class CategoriesController : Controller
   {
     private readonly ToDoListContext _db;
+    private readonly UserManager<ApplicationUser> _userManager; //new line
 
-    public CategoriesController(ToDoListContext db)
+    //updated constructor
+    public CategoriesController(UserManager<ApplicationUser> userManager, ToDoListContext db)
     {
+      _userManager = userManager;
       _db = db;
     }
 
@@ -27,9 +36,13 @@ namespace ToDoList.Controllers
     }
 
     [HttpPost]
-    public ActionResult Create(Category category)
+    public async Task<ActionResult> Create(Category category)
     {
+      var userId = this.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+      var currentUser = await _userManager.FindByIdAsync(userId);
+      category.User = currentUser;
       _db.Categories.Add(category);
+      _db.ApplicationUserCategory.Add(new ApplicationUserCategory() { ApplicationUser = currentUser, CategoryId = category.CategoryId });
       _db.SaveChanges();
       return RedirectToAction("Index");
     }

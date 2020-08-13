@@ -1,0 +1,23 @@
+@model ToDoList.Models.ApplicationUser
+
+@{
+  ViewData["Title"] = "My Items";
+}
+
+<div class="text-center">
+  <h1>@ViewData["Title"]</h1>
+</div>
+
+@if (Model.Items.Count == 0)
+{
+  <p>You have not created any items yet.</p>
+}
+else
+{
+  @foreach (var item in @ViewBag.MyItems)
+  {
+     <li>@Html.ActionLink($"{item.Description}", "Details", "Items", new { id = item.ItemId })</li>
+  }
+}
+
+<p>@Html.ActionLink("Add new item", "Create", "Items")</p>
